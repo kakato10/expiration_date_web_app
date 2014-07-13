@@ -1,0 +1,11 @@
+.soon-to-expire {
+	background-color: #FFFF00
+}
+
+.expiring {
+	background-color: #FF9900
+}
+
+.expired {
+	background-color: #FF3300
+}
