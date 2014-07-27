@@ -1,6 +1,6 @@
 $(document).ready(function(){
   var productsDb = [];
-
+  var productsNames = [];
   var getCurrentDate = function() {
     var today = new Date();
     var dd = today.getDate();
@@ -40,8 +40,24 @@ $(document).ready(function(){
     return checkDate(date) < -7;
   };
 
+  var alreadyAddedProductName = function(name){
+    if (productsNames !== undefined){
+      return productsNames.some(function(product){
+        return product === name;
+      });
+    }
+  };
+
   var updateDatabase = function(){
     localStorage.products = JSON.stringify(productsDb);
+  };
+
+  var getProductsNames = function(){
+    productsDb.forEach(function(product){
+      if(!alreadyAddedProductName(product.productName)){
+        productsNames.push(product.productName);
+      }
+    });
   };
 
   var optimiseDatabase = function() {
@@ -62,6 +78,14 @@ $(document).ready(function(){
     productsDb = JSON.parse(localStorage.products);
     };
     optimiseDatabase();
+    sortDataBase();
+    getProductsNames();
+  };
+
+  var sortDataBase = function(){
+    productsDb.sort(function(a,b){
+      return new Date(a.expirationDate) - new Date(b.expirationDate);
+    });
   };
 
   loadDatabase();
@@ -70,25 +94,24 @@ $(document).ready(function(){
     var productName = $("#product-name-box").val();
     var expirationDate = $("#date-box").val();
     var amount = $("#amount-box").val();
+    if(!alreadyAddedProductName(productName)){
+      productsNames.push(productName);
+    };
     productsDb.push ({
       productName: productName,
       expirationDate: expirationDate,
       amount: amount
     });
     updateDatabase();
+    sortDataBase();
+    $("#products-table").empty();
+    generateTable();
+
   };
 
-  var generateId = (function() {
-    var count = 0;
-    return function() {
-      count = count + 1;
-      return count;
-    }
-  } () );
 
   var generateProductRow = function(product){
-    product.id = generateId();
-    var productRowSource
+    var productRowSource;
     if (soonToExpire(product.expirationDate)) {
       productRowSource = $("#soon-to-expire").html();
     } else if (expiring(product.expirationDate)) {
@@ -114,7 +137,40 @@ $(document).ready(function(){
 
   $("#add").on("click", function() {
     addProduct();
-    var addedProduct = productsDb[productsDb.length - 1];
-    $("#products-table").append(generateProductRow(addedProduct));
+  });
+
+  var substringMatcher = function(strs) {
+    return function findMatches(q, cb) {
+      var matches, substrRegex;
+
+      // an array that will be populated with substring matches
+      matches = [];
+      console.log(q);
+
+      // regex used to determine if a string contains the substring `q`
+      substrRegex = new RegExp(q, 'i');
+
+      // iterate through the pool of strings and for any string that
+      // contains the substring `q`, add it to the `matches` array
+      $.each(strs, function(i, str) {
+        if (substrRegex.test(str)) {
+          // the typeahead jQuery plugin expects suggestions to a
+          // JavaScript object, refer to typeahead docs for more info
+          matches.push({ value: str });
+        }
+      });
+
+      cb(matches);
+    };
+  };
+
+  $('.typeahead').typeahead({
+    hint: true,
+    highlight: true,
+    minLength: 3
+  }, {
+    name: 'products',
+    displayKey: 'value',
+    source: substringMatcher(productsNames)
   });
 });

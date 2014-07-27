@@ -9,3 +9,19 @@
 .expired {
 	background-color: #FF3300
 }
+
+.tt-dropdown-menu {
+	border: 1px solid;
+	position: absolute;
+	background-color: white;
+	width: 193px;
+}
+
+.tt-suggestion {
+    padding: 5px 0px 0px 0px;
+    float: left;
+    width: 100%;
+}
+.tt-cursor {
+	background-color: #6699FF;
+}

@@ -7,7 +7,7 @@
 	</head>
 	<body>
 		<div align="center">
-			<label>Product: <input type="text" id="product-name-box"> </label>
+			<label>Product: <input type="text" id="product-name-box" class="typeahead" width="300"> </label>
 			<label>Expiration date: <input type="date" id="date-box"></label>
 			<label>Amount: <input type="number" id="amount-box"></label>
 			<button class="btn btn-primary" id="add">Add product</button>
@@ -16,48 +16,43 @@
 			<div class="row">
 				<table class="table table-bordered">
 					<thead>
-						<th>Id</th>
 						<th>Product</th>
 						<th>Expiration date</th>
 						<th>Amount</th>
 					</thead>
 					<tbody id="products-table">
-						
 					</tbody>
 				</table>
 			</div>
 		</div>
 		<script src='bower_components/jquery/dist/jquery.js'></script>
 		<script src='bower_components/bootstrap/dist/js/bootstrap.min.js'></script>
+		<script src='bower_components/typeahead.js/dist/typeahead.jquery.min.js'></script>
 		<script src='bower_components/handlebars/handlebars.min.js'></script>
 		<script type='text/javascript' src='app.js'></script>
 		<script type="text/x-handlebars-template" id="table-row-template">
-			<tr id="{{id}}">
-				<td>{{id}}</td>
+			<tr>
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
 			</tr>
 		</script>
 		<script type="text/x-handlebars-template" id="soon-to-expire">
-			<tr id="{{id}}" class="soon-to-expire">
-				<td>{{id}}</td>
+			<tr class="soon-to-expire">
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
 			</tr>
 		</script>
 		<script type="text/x-handlebars-template" id="expiring-table-row">
-			<tr id="{{id}}" class="expiring">
-				<td>{{id}}</td>
+			<tr class="expiring">
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
 			</tr>
 		</script>
 		<script type="text/x-handlebars-template" id="expired-table-row">
-			<tr id="{{id}}" class="expired">
-				<td>{{id}}</td>
+			<tr class="expired">
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
