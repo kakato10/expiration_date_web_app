@@ -48,8 +48,16 @@ $(document).ready(function(){
     }
   };
 
-  var updateDatabase = function(){
-    localStorage.products = JSON.stringify(productsDb);
+  var updateDatabase = function(newData, callback) {
+    $.ajax({
+      url: "http://localhost:3030/product",
+      type: "POST",
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify(newData)
+    }).done(function(data){
+      callback(data);
+    });
   };
 
   var getProductsNames = function(){
@@ -60,26 +68,50 @@ $(document).ready(function(){
     });
   };
 
+  var deleteProduct = function(product, callback) {
+    $.ajax({
+      url: "http://localhost:3030/product/delete",
+      type: "DELETE",
+      contentType: "application/json",
+      dataType: "json",
+      data: JSON.stringify(product)
+    }).done(function(data){
+      callback(data);
+    });
+  };
   var optimiseDatabase = function() {
     var expiredIds = [];
     productsDb.forEach(function(product, id){
       if (expiredLongAgo(product.expirationDate)) {
+        deleteProduct(product, function(){
+          console.log(product.productName + "has been deleted!")
+        });
         expiredIds.push(id);
       }
     });
     expiredIds.forEach(function(id){
       productsDb.splice(id, 1);
     });
-    updateDatabase();
   };
 
-  var loadDatabase = function() {
-    if(localStorage.products !== undefined) {
-    productsDb = JSON.parse(localStorage.products);
-    };
-    optimiseDatabase();
-    sortDataBase();
-    getProductsNames();
+  var getProducts = function(callback) {
+    $.ajax({
+        url: "http://localhost:3030/products",
+        type: "GET",
+        contentType: "application/json"
+    }).done(function(data, textStatus){
+      callback(data, textStatus);
+    });
+  };
+
+  var getDatabase = function(){
+    getProducts(function(products, textStatus) {
+      productsDb = products;
+      sortDataBase();
+      generateTable();
+      getProductsNames();
+      optimiseDatabase();
+    });
   };
 
   var sortDataBase = function(){
@@ -88,27 +120,33 @@ $(document).ready(function(){
     });
   };
 
-  loadDatabase();
+  getDatabase();
 
   var addProduct = function(){
     var productName = $("#product-name-box").val();
     var expirationDate = $("#date-box").val();
-    var amount = $("#amount-box").val();
-    if(!alreadyAddedProductName(productName)){
-      productsNames.push(productName);
+    var amount = parseInt($("#amount-box").val(),10);
+    if (expirationDate !== "" && !expiredLongAgo(expirationDate)) {
+      if(!alreadyAddedProductName(productName)){
+        productsNames.push(productName);
+      };
+      productsDb.push({
+        productName: productName,
+        expirationDate: expirationDate,
+        amount: amount
+      });
+      updateDatabase({
+        productName: productName,
+        expirationDate: expirationDate,
+        amount: amount
+      }, function(data, textStatus){
+        console.log("Updated");
+      });
+      sortDataBase();
+      $("#products-table").empty();
+      generateTable();
     };
-    productsDb.push ({
-      productName: productName,
-      expirationDate: expirationDate,
-      amount: amount
-    });
-    updateDatabase();
-    sortDataBase();
-    $("#products-table").empty();
-    generateTable();
-
   };
-
 
   var generateProductRow = function(product){
     var productRowSource;
@@ -133,8 +171,6 @@ $(document).ready(function(){
     $("#products-table").append(allRows);
   };
 
-  generateTable();
-
   $("#add").on("click", function() {
     addProduct();
   });
@@ -142,20 +178,10 @@ $(document).ready(function(){
   var substringMatcher = function(strs) {
     return function findMatches(q, cb) {
       var matches, substrRegex;
-
-      // an array that will be populated with substring matches
       matches = [];
-      console.log(q);
-
-      // regex used to determine if a string contains the substring `q`
       substrRegex = new RegExp(q, 'i');
-
-      // iterate through the pool of strings and for any string that
-      // contains the substring `q`, add it to the `matches` array
       $.each(strs, function(i, str) {
         if (substrRegex.test(str)) {
-          // the typeahead jQuery plugin expects suggestions to a
-          // JavaScript object, refer to typeahead docs for more info
           matches.push({ value: str });
         }
       });
