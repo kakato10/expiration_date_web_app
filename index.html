@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="bg">
 	<head>
 		<title>Expiration date web app</title>
     	<link href='bower_components/bootstrap/dist/css/bootstrap.min.css' rel='stylesheet'>
@@ -19,6 +19,7 @@
 						<th>Product</th>
 						<th>Expiration date</th>
 						<th>Amount</th>
+						<th></th>
 					</thead>
 					<tbody id="products-table">
 					</tbody>
@@ -31,31 +32,35 @@
 		<script src='bower_components/handlebars/handlebars.min.js'></script>
 		<script type='text/javascript' src='app.js'></script>
 		<script type="text/x-handlebars-template" id="table-row-template">
-			<tr>
+			<tr data-id="{{_id}}">
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
+				<td><img src="close.png" class="delete"></td>
 			</tr>
 		</script>
 		<script type="text/x-handlebars-template" id="soon-to-expire">
-			<tr class="soon-to-expire">
+			<tr class="soon-to-expire" data-id="{{_id}}">
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
+				<td><img src="close.png" class="delete"></td>
 			</tr>
 		</script>
 		<script type="text/x-handlebars-template" id="expiring-table-row">
-			<tr class="expiring">
+			<tr class="expiring" data-id="{{_id}}">
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
+				<td><img src="close.png" class="delete"></td>
 			</tr>
 		</script>
 		<script type="text/x-handlebars-template" id="expired-table-row">
-			<tr class="expired">
+			<tr class="expired" data-id="{{_id}}">
 				<td>{{productName}}</td>
 				<td>{{expirationDate}}</td>
 				<td>{{amount}}</td>
+				<td><img src="close.png" class="delete"></td>
 			</tr>
 		</script>
 	</body>

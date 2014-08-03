@@ -25,3 +25,12 @@
 .tt-cursor {
 	background-color: #6699FF;
 }
+
+.delete {
+	width : 30px;
+	height: auto;
+}
+
+#add:hover {
+	color : yellow;
+};

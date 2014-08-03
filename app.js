@@ -141,10 +141,14 @@ $(document).ready(function(){
         amount: amount
       }, function(data, textStatus){
         console.log("Updated");
+        $("#product-name-box").val("");
+        $("#date-box").val("");
+        $("#amount-box").val("");
+        sortDataBase();
+        $("#products-table").empty();
+        generateTable();
       });
-      sortDataBase();
-      $("#products-table").empty();
-      generateTable();
+
     };
   };
 
@@ -189,6 +193,19 @@ $(document).ready(function(){
       cb(matches);
     };
   };
+
+  $(document).on("click", ".delete", function(){
+    var productId = $(this).parent().parent().data("id");
+    var sureness = confirm("Are you sure that you want to delete this product?");
+    if(sureness){
+      deleteProduct(productsDb.filter(function(product){
+        return productId === product._id;
+      })[0], function(){
+        $("#products-table").empty();
+        getDatabase();
+      });
+    }
+  });
 
   $('.typeahead').typeahead({
     hint: true,
